@@ -1,29 +1,36 @@
+import requests
 import pandas as pd
-from scripts.web_scraping import fetch_property_ids
-from scripts.property_data_processing import fetch_property_bienes_data, preprocess_bienes_data
-from scripts.data_preprocessing import preprocess_data
-from scripts.geocoding import geocode_dataframe
+from bs4 import BeautifulSoup
+from utils.scraper import fetch_property_data, fetch_property_bienes_data
+from utils.processor import preprocess_data
+from utils.database import save_to_excel
 
-# Fetch property IDs
-properties_list = fetch_property_ids()
+def main():
+    property_ids_url = "https://subastas.boe.es/reg/subastas_ava.php?accion=Mas&id_busqueda=_ZURMUzR4WmN2Uk1VS1dkeEo1ZmFId0ppTUxjVVVQclNub3BnckVtQzdxeDJEY2Z6V2dOWVJRT0pqTlFlS01YVUUzZFdISmJpeTBEQVN1TVpnSGpodzNTYkhxNWo3ejY4eGNQVGZ1dHhCQ1hXM0lFZG1tMEhETGtBSE13ZGtiREZOSUh1d3RXMWFIZkVqNCtGbUhtWm1nd0Q4QWNYYkJrZHpqdzVDVFNOY094MFZkdkF5U2kvSXQ4Z0N4STBZakNwV0hnUnByWG5mMXRTZStidnc3YlByaEMvZXFSVkdDZXlJazF0eDlTK0hETTdMT0h4S3p6NEJJd21hdHEreXpZZVhyclFsdFI4RTRNVlBJbGlGbThicTNpT1NTWGVaNVRvRlpnMGN3Ky8xeHJHQmJDaGxBR0g3Um12V2FsbEJaZnM,-0-50"
 
-# Create a DataFrame
-df = pd.DataFrame(properties_list, columns=['Identificador'])
+    # Fetch the HTML content
+    response = requests.get(property_ids_url)
+    html_content = response.text
+    # Parse the HTML using BeautifulSoup
+    soup = BeautifulSoup(html_content, "html.parser")
 
-# Fetch property bienes data
-bienes_data = fetch_property_bienes_data(properties_list)
+    # Extract property IDs from the <a> elements with class 'resultado-busqueda-link-otro'
+    properties_list = [a['title'] for a in soup.find_all('a', class_='resultado-busqueda-link-otro')]
 
-# Create a DataFrame for bienes data
-bienes_df = pd.DataFrame(bienes_data)
+    # Fetch property data
+    property_data_df = fetch_property_data(properties_list)
 
-# Preprocess property bienes data
-preprocessed_bienes_df = preprocess_bienes_data(bienes_df)
+    # Fetch bienes data
+    bienes_data_df = fetch_property_bienes_data(properties_list)
 
-# Merge the main DataFrame with bienes data
-main_df = df.merge(preprocessed_bienes_df, on='Identificador', how='inner')
+    # Merge property and bienes data
+    main_df = property_data_df.merge(bienes_data_df, on='Identificador', how='inner')
 
-# Preprocess data
-df = preprocess_data(main_df)
+    # Data preprocessing and cleaning
+    main_df = preprocess_data(main_df)
 
-# Geocode addresses
-geocode_dataframe(df)
+    # Save the final DataFrame to Excel
+    save_to_excel(main_df, 'auction_properties.xlsx')
+
+if __name__ == "__main__":
+    main()
