@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import re
 
 def fetch_property_data(properties_list):
     data_list = []
@@ -17,7 +16,7 @@ def fetch_property_data(properties_list):
         table_div = soup.find("div", id="idBloqueDatos1")
         if table_div:
             table = table_div.find("table")
-            rows = table.find_all("tr")
+            rows = table.find_all("tr") # type: ignore
 
             property_data = {}
             for row in rows:
@@ -38,14 +37,14 @@ def fetch_property_bienes_data(properties_list):
         if property_info.startswith('Subasta SUB-'):
             property_id = property_info.split(' ')[-1]
 
-            url = f'https://subastas.boe.es/reg/detalleSubasta.php?idSub={property_id}&ver=3&idBus=_aGZaODZVK09aRlgzcFpxSzQ4SWlXa3ZOSDdnaFNaMkg1OWV0U2pHWjFwUEc2aHo5TVl3QjNtUnJUQ1FGS2ZoYmdoYS94cncxU1ZhYjNYMXFndzdyaVNvUlZpSUJHdm83eEVla3UyMElJYjJFcHpGdFB4N0RWQ20xRThPNFFrUStieGtWOWhaTlJuNGtqUXlyV3V3dFdYbWFPd3BGMnh3dlZaK2tXaElFQjVvZmhiUkdFMTJJYTYrUnRsMkU0enNHektmOUZRdnpYQmZHcERYRlY2bUdDVHE1UFZaLzJRS1BDMFlPNVhCb2R1SEYrOGljOW85djdqdE1zeWZySnNZQS8wTkhSS1lvWkxVMGJ5enJkWUhLdEhmYc9--50&idLote=&numPagBus='
+            url = f'https://subastas.boe.es/reg/detalleSubasta.php?idSub={property_id}&ver=3&idBus=_Y0wyY1ppR3hqa2xCZjhyNDREcndPME1hRHdnbXJaWkV4ME9mbW5XN0RIekkyMkpHdGErVHNZYURoUjViSlJua0JMQzltMS9nVXNUMjlFa1VBbG4yT2hoSGNEUGw5WjhoaGZtQzQrSHJGVTFqS2RUODJkL0RaMUxGSEpwemhPeU5DL1o3aW1NYmVpVG93S3d6UHAzWXNXS0c3VWlsQTBuRU9zL0FjQW1jSGRnamEzTFU2aERSUzVFZDBmS0NLNjljeTZOanZNWWxjNEVoZHZhc2pwU2hKZUJGTEg1T3ViREVLTGhlRXp4MjZXZHhjWkN2YmcxQ0NXNHNxNExJVmYrSGFaSDdoRU0xL0Q2OE9VR1R2c2ZSOEE9PQ,,-0-50&idLote=&numPagBus='
 
             response = requests.get(url)
             soup = BeautifulSoup(response.text, 'html.parser')
 
             div_id_bloque_datos3 = soup.find('div', id='idBloqueDatos3')
             if div_id_bloque_datos3:
-                data_divs = div_id_bloque_datos3.find_all('div', class_='bloque')
+                data_divs = div_id_bloque_datos3.find_all('div', class_='bloque') # type: ignore
                 for data_div in data_divs:
                     property_data = {'Descripción': property_info, 'Property ID': property_id}
 
@@ -62,6 +61,6 @@ def fetch_property_bienes_data(properties_list):
 
     bienes_df = pd.DataFrame(data_list)
     bienes_df.rename(columns={'Property ID':'Identificador'}, inplace=True)
-    columns_to_drop = ['Título jurídico', 'Información adicional', 'Valor Subasta', 'Valor de tasación', 'Importe del depósito', 'Puja mínima', 'Tramos entre pujas', 'IDUFIR']
+    columns_to_drop = ['Importe del depósito', 'Puja mínima', 'Tramos entre pujas']
     bienes_df = bienes_df.drop(columns=columns_to_drop)
     return bienes_df

@@ -1,14 +1,14 @@
 import pandas as pd
 import re
 
-def process_data(properties_data, bienes_data):
-    # Combine properties_data and bienes_data using the 'Identificador' column
-    main_df = properties_data.merge(bienes_data, on='Identificador', how='inner')
+# def merge_data(properties_data, bienes_data):
+#     # Combine properties_data and bienes_data using the 'Identificador' column
+#     main_df = properties_data.merge(bienes_data, on='Identificador', how='inner')
 
-    # Data preprocessing and cleaning
-    main_df = preprocess_data(main_df)
+#     # Data preprocessing and cleaning
+#     main_df = preprocess_data(main_df)
 
-    return main_df
+    # return main_df
 
 # Explanation:
 
@@ -19,9 +19,17 @@ def process_data(properties_data, bienes_data):
 
 def preprocess_data(df):
     # Perform data preprocessing and cleaning here
+    df = process_datetime_column(process_datetime_column(df, 'Fecha de inicio'), 'Fecha de conclusión')
     df = standardized_address(df)
     df = convert_numeric_columns(df)
     df = fillna_values(df)
+    # Apply the formatting function to the 'Descripción' column
+    df['Descripción'] = df['Descripción'].apply(format_description)
+    # Convert 'Localidad' and 'Provincia' columns to uppercase
+    df['Localidad'] = df['Localidad'].str.upper()
+    df['Provincia'] = df['Provincia'].str.upper()
+    # Create the "Dirección Mapa" column
+    df['Dirección Mapa'] = df['Dirección'].apply(extract_address)
     return df
 
 # Explanation:
@@ -31,6 +39,11 @@ def preprocess_data(df):
 #     The standardized_address(df) function is called to apply address standardization to the 'Dirección' column of the DataFrame. This function replaces or standardizes the street address terms in a consistent format.
 #     The convert_numeric_columns(df) function is called to perform appropriate conversion of numeric columns in the DataFrame.
 
+def process_datetime_column(df, column_name):
+    df[column_name] = df[column_name].apply(
+        lambda date_string: pd.to_datetime(date_string.split('CET')[0].strip(), format='%d-%m-%Y %H:%M:%S').date()
+    )
+    return df
 
 def standardized_address(df):
     # Create a mapping of first words to standardized forms
@@ -117,8 +130,7 @@ def standardized_address(df):
 def convert_numeric_columns(df):
     # List of columns to convert to float
     columns_to_convert = [
-        'Cantidad reclamada', 'Valor subasta', 'Tasación', 'Importe del depósito',
-        'Puja mínima', 'Tramos entre pujas'
+        'Valor subasta', 'Tasación','Puja mínima', 'Tramos entre pujas','Importe del depósito', 'Cantidad reclamada'
     ]
 
     # Loop through columns and perform necessary conversions
@@ -165,7 +177,7 @@ def convert_numeric_columns(df):
 
 def fillna_values(df):
     # Columns to fill with 'No consta'
-    columns_to_fill_with_no_consta = ['Localidad']
+    columns_to_fill_with_no_consta = ['Localidad', 'Forma adjudicación', 'Provincia', 'Tipo de subasta', 'Vivienda habitual','Situación posesoria','Visitable','IDUFIR','Inscripción registral','Información adicional','Cargas','Título jurídico','Valor Subasta','Valor de tasación']
     df[columns_to_fill_with_no_consta] = df[columns_to_fill_with_no_consta].fillna('No consta')
 
     # Fill NaN values in specific columns with 0
@@ -178,6 +190,22 @@ def fillna_values(df):
     # Fill NaN values in 'Cuenta expediente'
     df['Cuenta expediente'] = df['Cuenta expediente'].fillna('0123 4567 89 0987 65')
 
+    # Replace 'Sin lotes' with 0
+    df['Lotes'] = df['Lotes'].replace('Sin lotes', 0)
+
+    # Convert the 'Lotes' column to integer type
+    df['Lotes'] = df['Lotes'].astype(int)
+
+    # List of first words to filter out
+    words_to_filter = [
+        'LG', 'TN', 'PEBRES', 'VIVIENDA', 'CP', 'MN', '30005', 'PD', 'AR', 'CN',
+        'GREGORIO', 'NUEVA', 'POU', 'RAMON', 'PARAJE', 'PARTIDA', 'DISEMINADO',
+        'SAN', 'PEREIJO.', 'SANTA', 'CAÑOCLAR', 'NO', 'CLOSA', 'GRAN', 'LA', 'SUERTE'
+    ]
+
+    # Filter out rows with the specified first words in the address
+    df = df[~df['Dirección'].str.split().str[0].isin(words_to_filter)]
+
     return df
 
 # Explanation:
@@ -188,3 +216,27 @@ def fillna_values(df):
 #     Fill the specified columns with 0 using the .fillna() method.
 #     Fill NaN values in the 'Cuenta expediente' column with a default value using the .fillna() method.
 #     Return the modified DataFrame.
+
+def format_description(description):
+    formatted_words = []
+    words = description.split()
+
+    for word in words:
+        # Capitalize the first letter
+        formatted_word = word[0].upper() + word[1:].lower()
+
+        # If the word contains a '.', capitalize the next letter
+        if '.' in word:
+            formatted_word = formatted_word.replace('.', '. ').title()
+
+        formatted_words.append(formatted_word)
+
+    formatted_description = ' '.join(formatted_words)
+    return formatted_description
+
+
+def extract_address(address):
+    match = re.match(r'^(.*?\d+)\b', str(address))
+    if match:
+        return match.group(1)
+    return address
