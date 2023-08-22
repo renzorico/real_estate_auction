@@ -61,6 +61,6 @@ def fetch_property_bienes_data(properties_list):
 
     bienes_df = pd.DataFrame(data_list)
     bienes_df.rename(columns={'Property ID':'Identificador'}, inplace=True)
-    columns_to_drop = ['Importe del depósito', 'Puja mínima', 'Tramos entre pujas']
+    columns_to_drop = ['Importe del depósito', 'Puja mínima', 'Tramos entre pujas', 'Cantidad reclamada']
     bienes_df = bienes_df.drop(columns=columns_to_drop)
     return bienes_df

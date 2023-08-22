@@ -19,15 +19,19 @@ import re
 
 def preprocess_data(df):
     # Perform data preprocessing and cleaning here
-    df = process_datetime_column(process_datetime_column(df, 'Fecha de inicio'), 'Fecha de conclusión')
-    df = standardized_address(df)
-    df = convert_numeric_columns(df)
-    df = fillna_values(df)
+    df = (
+        process_datetime_column(
+            process_datetime_column(df, 'Fecha de inicio'),
+            'Fecha de conclusión'
+        )
+        .pipe(standardized_address)
+        .pipe(convert_numeric_columns)
+        .pipe(fillna_values)
+    )
     # Apply the formatting function to the 'Descripción' column
     df['Descripción'] = df['Descripción'].apply(format_description)
     # Convert 'Localidad' and 'Provincia' columns to uppercase
-    df['Localidad'] = df['Localidad'].str.upper()
-    df['Provincia'] = df['Provincia'].str.upper()
+    df[['Localidad', 'Provincia']] = df[['Localidad', 'Provincia']].applymap(str.upper)
     # Create the "Dirección Mapa" column
     df['Dirección Mapa'] = df['Dirección'].apply(extract_address)
     return df
@@ -132,7 +136,6 @@ def convert_numeric_columns(df):
     columns_to_convert = [
         'Valor subasta', 'Tasación','Puja mínima', 'Tramos entre pujas','Importe del depósito', 'Cantidad reclamada'
     ]
-
     # Loop through columns and perform necessary conversions
     for col in columns_to_convert:
         df[col] = df[col].apply(
@@ -150,7 +153,6 @@ def convert_numeric_columns(df):
             lambda x: x.replace(' €', '').replace('.', '').replace(',', '.') if isinstance(x, str) else x
         )
         df[col] = pd.to_numeric(df[col], errors='coerce')
-
     # Fill NaN values in specific columns
     columns_to_fill = [
         'Valor subasta', 'Puja mínima', 'Cantidad reclamada', 'Tasación',
