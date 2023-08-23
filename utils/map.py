@@ -1,62 +1,28 @@
-import pandas as pd
 import folium
-from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut
+import pandas as pd
 
-def generate_property_map(map_df):
-    # Geocoding using postal code and address
-    geolocator = Nominatim(user_agent="property_geocoder")
+def create_property_map(df):
+    # Initialize the map centered at the first property's coordinates
+    map_center = df['Coordinates'].iloc[0]
+    m = folium.Map(location=map_center, zoom_start=12)
 
-    def geocode_property(row):
-        try:
-            address_parts = []
+    # Add markers for each property
+    for index, property_data in df.iterrows():
+        if property_data['Coordinates']:
+            coords = property_data['Coordinates']
+            folium.Marker(coords, popup=property_data['Dirección']).add_to(m)
 
-            if not pd.isnull(row['Dirección Mapa']):
-                address_parts.append(row['Dirección Mapa'])
+    return m
 
-            if not pd.isnull(row['Código Postal']):
-                address_parts.append(str(row['Código Postal']))
+def main():
+    # Read the main_df DataFrame
+    main_df = pd.read_csv('data/propiedades_final_geocoded.csv')
 
-            if not pd.isnull(row['Localidad']):
-                address_parts.append(row['Localidad'])
+    # Create the property map
+    property_map = create_property_map(main_df)
 
-            if not pd.isnull(row['Provincia']):
-                address_parts.append(row['Provincia'])
+    # Save the map to an HTML file
+    property_map.save('property_map.html')
 
-            full_address = ', '.join(address_parts)
-            print(f"Geocoding address: {full_address}")
-
-            location = geolocator.geocode(full_address, timeout=20)  # type: ignore
-            if location:
-                return location.latitude, location.longitude # type: ignore
-            else:
-                return None
-        except GeocoderTimedOut:
-            print(f"Geocoding timed out for address: {full_address}")
-            return None
-        except Exception as e:
-            print(f"Error during geocoding for address {full_address}: {e}")
-            return None
-
-    # Apply geocoding to get coordinates and drop rows with invalid locations
-    map_df['Coordinates'] = map_df.apply(geocode_property, axis=1)
-    map_df = map_df.dropna(subset=['Coordinates'])
-
-    # Create a Folium map centered in Spain
-    map_center = [40.4168, -3.7038]  # Coordinates for the center of Spain
-    property_map = folium.Map(location=map_center, zoom_start=6)
-
-    # Add markers for each property with identifiers as popups
-    located_count = 0  # Counter for located properties
-    for _, row in map_df.iterrows():
-        folium.Marker(
-            location=row['Coordinates'],
-            popup=row['Identificador'],
-        ).add_to(property_map)
-        located_count += 1
-
-    # Print the number of located properties
-    print(f"Number of located properties: {located_count}")
-
-    # Save the map as an HTML file
-    property_map.save('data/properties_map.html')
+if __name__ == "__main__":
+    main()

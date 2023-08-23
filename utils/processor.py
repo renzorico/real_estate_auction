@@ -1,22 +1,6 @@
 import pandas as pd
 import re
 
-# def merge_data(properties_data, bienes_data):
-#     # Combine properties_data and bienes_data using the 'Identificador' column
-#     main_df = properties_data.merge(bienes_data, on='Identificador', how='inner')
-
-#     # Data preprocessing and cleaning
-#     main_df = preprocess_data(main_df)
-
-    # return main_df
-
-# Explanation:
-
-#     The function process_data takes two DataFrames properties_data and bienes_data as input. These DataFrames contain property information and bienes (goods) information, respectively.
-#     Using the .merge() method with the on='Identificador' argument, the function combines the two DataFrames based on the 'Identificador' column (assuming this column contains unique identifiers for each property) using an inner join (how='inner'). This results in a DataFrame main_df that contains combined property and bienes information.
-#     The function then proceeds to preprocess and clean the data in the main_df DataFrame by calling the preprocess_data function. This is a function you would define to handle specific data preprocessing tasks, such as converting date formats, handling missing values, and standardizing address formats.
-#     Finally, the function returns the preprocessed and cleaned DataFrame main_df, which contains combined and processed property and bienes information ready for further analysis or export.
-
 def preprocess_data(df):
     # Perform data preprocessing and cleaning here
     df = (
@@ -25,8 +9,10 @@ def preprocess_data(df):
             'Fecha de conclusión'
         )
         .pipe(standardized_address)
+        .pipe(create_direccion_mapa_column)
         .pipe(convert_numeric_columns)
         .pipe(fillna_values)
+        .pipe(remove_invalid_rows)
     )
     # Apply the formatting function to the 'Descripción' column
     df['Descripción'] = df['Descripción'].apply(format_description)
@@ -49,9 +35,19 @@ def process_datetime_column(df, column_name):
     )
     return df
 
+def create_direccion_mapa_column(df):
+    df['Dirección Mapa'] = df['Dirección'].apply(extract_address)
+    return df
+
+def remove_invalid_rows(df):
+    # Drop rows with missing 'Dirección Mapa' or 'Código Postal' values
+    df = df.dropna(subset=['Dirección Mapa', 'Código Postal'])
+    return df
+
 def standardized_address(df):
     # Create a mapping of first words to standardized forms
     standardized_mapping = {
+    'C/': 'CALLE',
     'CL': 'CALLE',
     'LUGAR': 'LUGAR',
     'CAMINO': 'CAMINO',
