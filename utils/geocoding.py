@@ -1,14 +1,15 @@
 import pandas as pd
 from geopy.geocoders import GoogleV3
 from geopy.exc import GeocoderTimedOut
-from utils.database import save_to_csv
+from database import save_to_csv
+import os
 
 # Read the DataFrame
 # df = pd.read_csv('data/propiedades_final.csv')
 
 def geocode_addresses(df):
     # Geocoding using Google Maps Geocoding API
-    geolocator = GoogleV3(api_key='AIzaSyBfKgsNTWnBLP2w_xy_ycF5XFHu4UKsf_A')
+    geolocator = GoogleV3(api_key=os.environ['GOOGLE_MAPS_API_KEY'])
 
     def geocode_property(row):
         try:
