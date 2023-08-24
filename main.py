@@ -37,14 +37,14 @@ def main():
     # Data preprocessing and cleaning
     main_df = preprocess_data(main_df)
 
-    # Save the final DataFrame to CSV
-    save_to_csv(main_df, 'data/propiedades_final.csv')
+    # # Save the final DataFrame to CSV
+    # save_to_csv(main_df, 'data/propiedades_final.csv')
 
     # Geocoding
     main_df = geocode_addresses(main_df)
     # Save the final DataFrame to Excel
-    save_to_excel(main_df, 'data/propiedades_final_geocoded.xlsx')
-    save_to_csv(main_df, 'data/propiedades_final_geocoded.csv')
+    save_to_excel(main_df, 'data/propiedades_geocoded.xlsx')
+    # save_to_csv(main_df, 'data/propiedades_geocoded.csv')
 
     # Create and save the property map
     property_map = create_property_map(main_df)

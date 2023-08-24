@@ -1,16 +1,18 @@
 import pandas as pd
-from geopy.geocoders import Nominatim
+from geopy.geocoders import GoogleV3
 from geopy.exc import GeocoderTimedOut
+from utils.database import save_to_csv
 
-df = pd.read_csv('data/propiedades_final.csv')# , dtype={'Código Postal': str})
+# Read the DataFrame
+# df = pd.read_csv('data/propiedades_final.csv')
 
 def geocode_addresses(df):
-    # Geocoding using address
-    geolocator = Nominatim(user_agent="property_geocoder")
+    # Geocoding using Google Maps Geocoding API
+    geolocator = GoogleV3(api_key='AIzaSyBfKgsNTWnBLP2w_xy_ycF5XFHu4UKsf_A')
 
     def geocode_property(row):
         try:
-            full_address = f"{row['Dirección Mapa']} {row['Código Postal']}"
+            full_address = f"{row['Código Postal']} {row['Dirección Mapa']}"
 
             location = geolocator.geocode(full_address, timeout=20) # type: ignore
             if location:
@@ -18,12 +20,18 @@ def geocode_addresses(df):
             else:
                 return None
         except GeocoderTimedOut:
-            print(f"Geocoding timed out for address: {full_address}") # type: ignore
+            print(f"Geocoding timed out for address: {full_address}")# type: ignore
             return None
         except Exception as e:
-            print(f"Error during geocoding for address {full_address}: {e}") # type: ignore
+            print(f"Error during geocoding for address {full_address}: {e}")# type: ignore
             return None
 
-    # # Apply geocoding to get coordinates
+    # Apply geocoding to get coordinates
     df['Coordinates'] = df.apply(geocode_property, axis=1)
+
+    save_to_csv(df, 'data/propiedades_geocoded.csv')
     return df
+
+
+# # Call the function to geocode addresses
+# geocoded_df = geocode_addresses(df)
