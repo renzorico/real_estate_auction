@@ -1,3 +1,6 @@
 antes/
 data/
 .env
+
+# Local Netlify folder
+.netlify

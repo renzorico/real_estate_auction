@@ -3,7 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from utils.scraper import fetch_property_data, fetch_property_bienes_data
 from utils.processor import preprocess_data
-from utils.database import save_to_excel, save_to_csv
+from utils.database import save_to_excel #, save_to_csv
 from utils.geocoding import geocode_addresses
 from utils.map import create_property_map
 
