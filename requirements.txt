@@ -13,8 +13,8 @@ Babel==2.10.3
 backcall==0.2.0
 beautifulsoup4==4.11.1
 bleach==5.0.1
-blinker==1.5
-branca==0.5.0
+blinker==1.6.2
+branca==0.6.0
 cachetools==5.2.0
 certifi==2022.9.24
 cffi==1.15.1
@@ -43,8 +43,9 @@ executing==1.1.1
 fastjsonschema==2.16.2
 Fiona==1.9.4.post1
 flake8==4.0.1
+Flask==2.3.3
 flatbuffers==22.9.24
-folium==0.12.1.post1
+folium==0.14.0
 fonttools==4.38.0
 fsspec==2022.10.0
 gast==0.4.0
@@ -88,6 +89,7 @@ ipython==8.5.0
 ipython-genutils==0.2.0
 ipywidgets==7.7.2
 isort==5.10.1
+itsdangerous==2.1.2
 jedi==0.18.1
 Jinja2==3.1.2
 joblib==1.1.1
@@ -158,7 +160,7 @@ prometheus-client==0.15.0
 promise==2.3
 prompt-toolkit==3.0.31
 proto-plus==1.22.1
-protobuf==3.19.6
+protobuf==4.24.2
 psutil==5.9.3
 psycopg2-binary==2.9.4
 ptyprocess==0.7.0
@@ -171,7 +173,7 @@ pycodestyle==2.8.0
 pycparser==2.21
 pydantic==1.9.2
 pydata-google-auth==1.4.0
-pydeck==0.8.0b4
+pydeck==0.8.0
 pyflakes==2.4.0
 Pygments==2.13.0
 pylint==2.14.5
@@ -215,7 +217,8 @@ sqlparse==0.4.4
 stack-data==0.5.1
 statsmodels==0.13.2
 stopit==1.1.2
-streamlit==1.11.1
+streamlit==1.26.0
+streamlit-folium==0.13.0
 tangled-up-in-unicode==0.2.0
 tenacity==8.1.0
 tensorboard==2.10.1
@@ -249,11 +252,11 @@ update-checker==0.18.0
 urllib3==1.26.12
 validators==0.20.0
 visions==0.7.5
-watchdog==2.1.9
+watchdog==3.0.0
 wcwidth==0.2.5
 webencodings==0.5.1
 websocket-client==1.4.1
-Werkzeug==2.2.2
+Werkzeug==2.3.7
 widgetsnbextension==3.6.1
 wrapt==1.14.1
 wsproto==1.2.0
