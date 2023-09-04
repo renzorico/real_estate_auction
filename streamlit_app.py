@@ -7,10 +7,8 @@ import pandas as pd
 df = pd.read_csv('data/propiedades_geocoded.csv')
 
 # Select only the desired columns
-columns_to_keep = ['Identificador', 'Tipo de subasta', 'Fecha de inicio', 'Fecha de conclusión',
-                    'Cantidad reclamada', 'Valor subasta', 'Tasación', 'Tramos entre pujas',
-                    'Importe del depósito', 'Localidad',
-                    'Provincia','Dirección Mapa', 'Coordinates']
+columns_to_keep = ['Identificador', 'Tipo de subasta', 'Fecha de inicio', 'Fecha de conclusión','Cantidad reclamada', 'Valor subasta', 'Tasación', 'Tramos entre pujas',
+'Importe del depósito', 'Localidad','Provincia','Dirección Mapa', 'Coordinates']
 df = df[columns_to_keep]
 
 # Get unique values for 'Tipo de subasta' and 'Provincia'
