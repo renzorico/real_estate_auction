@@ -15,7 +15,7 @@ Installation
 
 Clone the Repository:
 
-    git clone https://github.com/yourusername/real-estate-auction-scraper.git
+    git clone https://github.com/renzorico/real-estate-auction.git
     cd real-estate-auction-scraper
 
 Install Dependencies:
