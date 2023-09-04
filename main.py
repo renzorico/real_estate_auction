@@ -1,9 +1,8 @@
 import requests
-import pandas as pd
 from bs4 import BeautifulSoup
 from utils.scraper import fetch_property_data, fetch_property_bienes_data
 from utils.processor import preprocess_data
-from utils.database import save_to_excel,save_to_csv
+from utils.database import save_to_excel
 from utils.geocoding import geocode_addresses
 from utils.map import create_property_map
 
@@ -18,6 +17,7 @@ def main():
     # Fetch the HTML content
     response = requests.get(property_ids_url)
     html_content = response.text
+    
     # Parse the HTML using BeautifulSoup
     soup = BeautifulSoup(html_content, "html.parser")
 
@@ -36,15 +36,11 @@ def main():
 
     # Data preprocessing and cleaning
     main_df = preprocess_data(main_df)
-
-    # # Save the final DataFrame to CSV
-    # save_to_csv(main_df, 'data/propiedades_final.csv')
-
+    
     # Geocoding
     main_df = geocode_addresses(main_df)
     # Save the final DataFrame to Excel
     save_to_excel(main_df, 'data/propiedades_geocoded.xlsx')
-    # save_to_csv(main_df, 'data/propiedades_geocoded.csv')
 
     # Create and save the property map
     property_map = create_property_map(main_df)

@@ -5,11 +5,15 @@ def create_property_map(df):
     # Extract latitude and longitude from the first row of the 'Coordinates' column
     first_coordinates = df['Coordinates'].iloc[0]
 
-    # Check if the coordinates are already in float format (no parentheses)
-    if isinstance(first_coordinates, float):
-        map_center = [first_coordinates, df['Coordinates'].iloc[1]]
+    # Check if the coordinates are already in float format (no parentheses) and not None
+    if first_coordinates is not None:
+        if isinstance(first_coordinates, float):
+            map_center = [first_coordinates, df['Coordinates'].iloc[1]]
+        else:
+            map_center = [float(coord) for coord in first_coordinates.replace('(', '').replace(')', '').split(', ')]
     else:
-        map_center = [float(coord) for coord in first_coordinates.replace('(', '').replace(')', '').split(', ')]
+        # Handle the case where first_coordinates is None (no data available)
+        map_center = [0, 0]  # You can set a default center here
 
     # Create a Folium map centered at the extracted coordinates
     m = folium.Map(location=map_center, zoom_start=12)
@@ -22,6 +26,7 @@ def create_property_map(df):
             folium.Marker([latitude, longitude], popup=row['Dirección Mapa']).add_to(m)
 
     return m
+
 
 def main():
     # Read the main_df DataFrame

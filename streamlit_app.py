@@ -6,6 +6,7 @@ import pandas as pd
 # Read the DataFrame with geocoded coordinates
 df = pd.read_csv('data/propiedades_geocoded.csv')
 
+
 # Get unique values for 'Tipo de subasta' and 'Provincia'
 auction_types = df['Tipo de subasta'].unique()
 provinces = df['Provincia'].unique()
