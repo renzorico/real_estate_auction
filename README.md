@@ -1,7 +1,6 @@
 Real Estate Auction Scraper
-Overview
 
-This project is a web scraper designed to extract real estate auction data from a government website. It gathers property information, including addresses, auction dates, and property types, and provides a user-friendly interface to explore the data. This README provides an overview of the project's features, installation instructions, usage guide, and additional information.
+This project is a web scraper designed to extract real estate auction data from Spain government website. It gathers property information, including addresses, auction dates, and property types, and provides a user-friendly interface to explore the data. This README provides an overview of the project's features, installation instructions, usage guide, and additional information.
 
 Features
 
