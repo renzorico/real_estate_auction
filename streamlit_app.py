@@ -4,7 +4,7 @@ from streamlit_folium import folium_static
 import pandas as pd
 
 # Read the DataFrame with geocoded coordinates
-df = pd.read_csv('data/propiedades_geocoded.csv')
+df = pd.read_csv('/home/renzorico/code/renzorico/06_subastas/data/propiedades_geocoded.csv')
 
 # Select only the desired columns
 columns_to_keep = ['Identificador', 'Tipo de subasta', 'Fecha de inicio', 'Fecha de conclusión','Cantidad reclamada', 'Valor subasta', 'Tasación', 'Tramos entre pujas',
@@ -58,7 +58,7 @@ if not filtered_df.empty:
     median_longitude = filtered_df['Coordinates'].apply(get_longitude).median()
 
     # Display the map
-    st.write('## Mapa propiedades disponibles')
+    st.write('## Mapa')
     m = folium.Map(location=[median_latitude, median_longitude], zoom_start=12, min_zoom=3, max_zoom=15)
     for index, row in filtered_df.iterrows():
         coordinates = row['Coordinates']
