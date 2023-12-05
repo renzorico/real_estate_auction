@@ -2,9 +2,13 @@ import streamlit as st
 import folium
 from streamlit_folium import folium_static
 import pandas as pd
+import os
 
 # Read the DataFrame with geocoded coordinates
 df = pd.read_csv('/home/renzorico/code/renzorico/06_subastas/data/propiedades_geocoded.csv')
+
+print("Current Directory:", os.getcwd())
+print("Files in Current Directory:", os.listdir())
 
 # Select only the desired columns
 columns_to_keep = ['Identificador', 'Tipo de subasta', 'Fecha de inicio', 'Fecha de conclusión','Cantidad reclamada', 'Valor subasta', 'Tasación', 'Tramos entre pujas',
