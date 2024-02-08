@@ -8,7 +8,7 @@ def create_property_map(df):
     # Check if the coordinates are already in float format (no parentheses) and not None
     if first_coordinates is not None:
         if isinstance(first_coordinates, float):
-            map_center = [first_coordinates, df['Coordinates'].iloc[1]]
+            map_center = [float(coord) for coord in str(first_coordinates).split(',')]
         else:
             map_center = [float(coord) for coord in first_coordinates.replace('(', '').replace(')', '').split(', ')]
     else:
@@ -21,12 +21,10 @@ def create_property_map(df):
     # Add markers for each property's coordinates
     for index, row in df.iterrows():
         coordinates = row['Coordinates']
-        if isinstance(coordinates, str):
-            latitude, longitude = map(float, coordinates.replace('(', '').replace(')', '').split(', '))
-            folium.Marker([latitude, longitude], popup=row['Dirección Mapa']).add_to(m)
+        latitude, longitude = map(float, coordinates.split(', '))
+        folium.Marker([latitude, longitude], popup=row['Dirección Mapa']).add_to(m)
 
     return m
-
 
 def main():
     # Read the main_df DataFrame
